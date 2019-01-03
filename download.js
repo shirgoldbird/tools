@@ -25,7 +25,7 @@ async function cloneRepositories(repos) {
     }
 
     await parallelForEach(repos, async (repo, count, total) => {
-        cloneOneRepo(repo, program.dest, program.token, `[${count}/${total} ${repo.RepositoryName}]:`, program.force)
+        cloneOneRepo(repo, program.dest, program.token, `[${repo.RepositoryName}]:`, program.force)
     })
 }
 
