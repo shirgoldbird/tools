@@ -7,11 +7,22 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Search",
+            "program": "${workspaceFolder}/searchSDP.js",
+            "args": [
+                "-p",
+                "dest"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "extractRepoListFromExcel",
             "program": "${workspaceFolder}/extractRepoListFromExcel.js",
             "args": [
                 "repos.xlsx",
-                "--output", "test.txt"
+                "--output",
+                "test.txt"
             ]
         },
         {
@@ -20,8 +31,10 @@
             "name": "Download",
             "program": "${workspaceFolder}/download.js",
             "args": [
-                "--githubToken", "githubAccount",
-                "--list", "repos.txt"
+                "--githubToken",
+                "githubAccount",
+                "--list",
+                "repos.txt"
             ]
         }
     ]
