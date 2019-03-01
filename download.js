@@ -1,5 +1,6 @@
+#!/usr/bin/env node
+
 const program = require('commander')
-const xlsx = require('xlsx')
 const path = require('path')
 const fs = require('fs-extra')
 const parallelRun = require('./utils/parallel.js')
@@ -15,14 +16,14 @@ program
     .option('--workerNumber', 'number of workers, default to be 4', 4)
     .parse(process.argv);
 
-var workbook = xlsx.readFile(program.list);
-var repoList = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+var repoList = getRepoList(program.list)
+
 cloneRepositories(repoList, program.dest, program.githubToken, program.vstsToken, program.cloneVSTSRepo, program.workerNumber, program.force);
 
 function cloneRepositories(repos, dest, githubToken, vstsToken, cloneVSTSRepo, workerNumber, force) {
     var commands = []
     repos.forEach(repo => {
-        var repository = new Repository(repo.RepositoryURL, {
+        var repository = new Repository(repo, {
             githubToken: githubToken,
             vstsToken: vstsToken
         });
@@ -42,7 +43,7 @@ function cloneRepositories(repos, dest, githubToken, vstsToken, cloneVSTSRepo, w
                 command: `git clone ${repository.repositoryUrlWithToken} "${clonePath}"`,
                 name: `${repository.repoOwner}/${repository.repoName}`
             })
-        } else if(repository.isVSTSRepo && cloneVSTSRepo){
+        } else if (repository.isVSTSRepo && cloneVSTSRepo) {
             commands.push({
                 command: `git clone ${repository.repositoryUrlWithToken} "${clonePath}"`,
                 name: `${repository.repoOwner}/${repository.repoName}`
@@ -50,4 +51,18 @@ function cloneRepositories(repos, dest, githubToken, vstsToken, cloneVSTSRepo, w
         }
     });
     parallelRun(commands, workerNumber);
+}
+
+function getRepoList(filePath) {
+    var repoList = [];
+    fs.readFileSync(filePath, 'utf-8')
+        .split('\n')
+        .forEach(repo => {
+            repo = repo.trim();
+            if (repo) {
+                repoList.push(repo);
+            }
+        });
+
+    return repoList;
 }
