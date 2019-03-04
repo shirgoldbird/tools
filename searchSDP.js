@@ -1,5 +1,7 @@
 var program = require('commander')
 var fs = require('fs-extra')
+var glob = require('glob')
+var path = require('path')
 var Q = require('q');
 
 var { searchFromFolders } = require('./utils/search_util')
@@ -9,15 +11,25 @@ program
 
 program.parse(process.argv);
 
-searchFromFolders(program.basePath, async function (file) {
-    var firstLineContent = await readFirstLine(file);
-    var content = firstLineContent.replace(/^\uFEFF/, '')
+searchFromFolders(
+    program.basePath,
+    (searchPath) => {
+        return glob.sync(
+            path.join(searchPath, '**/*.yml'),
+            {
+                dot: true,
+                ignore: '**/{TOC,toc}.yml'
+            })
+    },
+    async function (file) {
+        var firstLineContent = await readFirstLine(file);
+        var content = firstLineContent.replace(/^\uFEFF/, '')
 
-    if (content.startsWith('### YamlMime:')) {
-        return content.substr('### YamlMime:'.length)
-    }
-    return 0;
-})
+        if (content.startsWith('### YamlMime:')) {
+            return content.substr('### YamlMime:'.length).trim()
+        }
+        return 0;
+    })
 
 function readFirstLine(path) {
     return Q.promise(function (resolve, reject) {

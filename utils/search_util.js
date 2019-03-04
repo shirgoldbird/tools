@@ -1,29 +1,24 @@
-var fs = require('fs-extra')
-var glob = require('glob')
-var path = require('path')
-var program = require('commander')
+const glob = require('glob')
+const path = require('path')
+const git = require('simple-git/promise')
 
 const parallelForEach = async (array, callback) => {
     var callbacks = []
     for (let index = 0; index < array.length; index++) {
-        callbacks.push(callback(array[index], index, array.length - 1))
+        callbacks.push(callback(array[index], index + 1, array.length))
     }
 
     await Promise.all(callbacks)
 }
 
-async function searchFromFolders(basePath, searchFromFile) {
+async function searchFromFolders(basePath, searchGlob, searchFromFile) {
     var result = [];
     var repoCount = 1;
 
-    const dirs = fs.readdirSync(program.basePath).filter(f => fs.statSync(path.join(program.basePath, f)).isDirectory())
-    dirs.forEach(async dir => {
-        const files = glob.sync(
-            path.join(basePath, dir, '**/*.yml'),
-            {
-                dot: true,
-                ignore: '**/{TOC, toc, index}.yml'
-            })
+    const gitFolders = glob.sync(`${basePath}/**/.git/`, { dot: true }).map(item => item.substring(basePath.length + 1, item.length - 6))
+    console.log(`Found ${gitFolders.length} git folder under the search destination`);
+    gitFolders.forEach(async dir => {
+        const files = searchGlob(path.join(basePath, dir));
         console.log(`searching from folder ${dir}...`)
         var itemCount = {};
         await parallelForEach(files, async (file, count, total) => {
@@ -40,23 +35,46 @@ async function searchFromFolders(basePath, searchFromFile) {
                 }
             }
         })
-        if (Object.keys(itemCount).length > 0) {
-            result.push({
-                FolderName: dir,
-                totalFileCount: files.length,
-                itemCount
-            })
-        }
-        if (repoCount == dirs.length) {
-            console.log("search result:")
-            result.forEach(item => {
-                console.log(`${item.FolderName}:`)
-                Object.keys(item.itemCount).forEach(key => {
-                    console.log(`    ${key}: ${item.itemCount[key]}/${item.totalFileCount}`)
-                })
-            })
+        result.push({
+            folderName: dir,
+            repositoryUrl: (await git(path.join(basePath, dir)).listRemote(['--get-url'])).trim(),
+            totalFileCount: files.length,
+            itemCount
+        })
+
+        if (repoCount == gitFolders.length) {
+            generateReport(result, gitFolders);
         }
         repoCount = repoCount + 1;
+    })
+}
+
+function generateReport(result, gitFolders) {
+    console.log('============================')
+    console.log('# Here is the search report:')
+    console.log('------')
+    console.log(`  ## There are ${gitFolders} git folder founded in the search destination folder, here is all the their repository urls:`)
+    result.forEach(item => {
+        console.log(`    ${item.repositoryUrl}`)
+    })
+
+    console.log('------')
+    console.log('  ## Here are the repositories which contains the search target:')
+    result
+    .filter(item => {
+        return Object.keys(item.itemCount).length > 0;
+    })
+    .forEach(item => {
+        console.log(`    ${item.repositoryUrl}`)
+    })
+
+    console.log('------')
+    console.log('  ## Here is the detail search result:')
+    result.forEach(item => {
+        console.log(`    ${item.folderName}(${item.repositoryUrl}):`)
+        Object.keys(item.itemCount).forEach(key => {
+            console.log(`      ${key}: ${item.itemCount[key]}/${item.totalFileCount}`)
+        })
     })
 }
 
