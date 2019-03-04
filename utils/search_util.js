@@ -50,27 +50,27 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
 }
 
 function generateReport(result, gitFolders) {
+    const foundItems = result.filter(item => {
+        return Object.keys(item.itemCount).length > 0;
+    });
+
     console.log('============================')
     console.log('# Here is the search report:')
     console.log('------')
-    console.log(`  ## There are ${gitFolders} git folder founded in the search destination folder, here is all the their repository urls:`)
+    console.log(`  ## There are ${gitFolders.length} git folder founded in the search destination folder, here is all the their repository urls:`)
     result.forEach(item => {
         console.log(`    ${item.repositoryUrl}`)
     })
 
     console.log('------')
     console.log('  ## Here are the repositories which contains the search target:')
-    result
-    .filter(item => {
-        return Object.keys(item.itemCount).length > 0;
-    })
-    .forEach(item => {
+    foundItemss.forEach(item => {
         console.log(`    ${item.repositoryUrl}`)
     })
 
     console.log('------')
     console.log('  ## Here is the detail search result:')
-    result.forEach(item => {
+    foundItems.forEach(item => {
         console.log(`    ${item.folderName}(${item.repositoryUrl}):`)
         Object.keys(item.itemCount).forEach(key => {
             console.log(`      ${key}: ${item.itemCount[key]}/${item.totalFileCount}`)
