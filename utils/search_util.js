@@ -64,7 +64,7 @@ function generateReport(result, gitFolders) {
 
     console.log('------')
     console.log('  ## Here are the repositories which contains the search target:')
-    foundItemss.forEach(item => {
+    foundItems.forEach(item => {
         console.log(`    ${item.repositoryUrl}`)
     })
 
