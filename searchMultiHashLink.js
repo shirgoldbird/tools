@@ -21,7 +21,6 @@ function searchMarkdowns(searchPath) {
 
 async function getMultiHashLinks(file) {
     const result = [];
-    console.log(`reading '${file}'...`);
     const content = fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
     content.replace(
         linkRegex,
