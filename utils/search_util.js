@@ -1,3 +1,4 @@
+const fs = require('fs')
 const glob = require('glob')
 const path = require('path')
 const git = require('simple-git/promise')
@@ -17,7 +18,7 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
 
     const gitFolders = glob.sync(`${basePath}/**/.git/`, { dot: true }).map(item => item.substring(basePath.length + 1, item.length - 6))
     console.log(`Found ${gitFolders.length} git folder under the search destination`);
-    gitFolders.forEach(async dir => {
+    for await ( const dir of gitFolders) {
         const files = searchGlob(path.join(basePath, dir));
         console.log(`searching from folder ${dir}...`)
         var itemCount = {};
@@ -46,7 +47,8 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
             generateReport(result, gitFolders);
         }
         repoCount = repoCount + 1;
-    })
+    }
+    fs.writeFileSync(`output-${(new Date()).getTime()}.json`, JSON.stringify(result))
 }
 
 function generateReport(result, gitFolders) {
