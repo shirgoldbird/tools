@@ -47,6 +47,18 @@
                 "--list",
                 "repos.txt"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "addTeamsRepo",
+            "program": "${workspaceFolder}/addTeamsRepo.js",
+            "args": [
+                "--githubToken", "{githubToken}",
+                "--list", "test.txt",
+                "--team", "docs-build-content-migration-team",
+                "--org", "MicrosoftDocs"
+            ]
         }
     ]
 }

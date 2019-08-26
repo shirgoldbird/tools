@@ -1,0 +1,45 @@
+{
+    "extends": "airbnb-base",
+    "env": {
+      "node": true,
+      "mocha": true
+    },
+    "rules": {
+      "no-prototype-builtins": "off",
+      "no-param-reassign": "off",
+      "no-underscore-dangle": "off",
+      "prefer-destructuring": "off",
+      "max-len": "off",
+      "consistent-return": "off",
+      "no-await-in-loop": "off",
+      "no-shadow": "off",
+      "no-plusplus": "off",
+      "no-continue": "off",
+      "no-bitwise": "off",
+      "no-use-before-define": [
+        "error",
+        {
+          "functions": false,
+          "variables": false
+        }
+      ],
+      "no-restricted-syntax": [
+        "off",
+        {
+          "selector": "ForInStatement"
+        },
+        {
+          "selector": "ForOfStatement"
+        },
+        "error",
+        {
+          "selector": "LabeledStatement"
+        },
+        {
+          "selector": "WithStatement"
+        }
+      ],
+      "no-console": "off",
+      "linebreak-style": "off"
+    }
+  }
