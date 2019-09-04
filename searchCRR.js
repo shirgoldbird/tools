@@ -18,6 +18,9 @@ function searchMarkdowns(searchPath) {
 }
 
 async function searchCRR(file) {
+    if (!fs.existsSync(file)) {
+        return false;
+    }
     const config = fs.readJSONSync(file, { encoding: 'utf-8' });
     var targetFound = false;
     if (config.dependent_repositories) {
