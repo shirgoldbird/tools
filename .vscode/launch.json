@@ -17,6 +17,26 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "SearchCRR",
+            "program": "${workspaceFolder}/searchCRR.js",
+            "args": [
+                "-p",
+                "dest"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "searchCRRFromAllBranch",
+            "program": "${workspaceFolder}/searchCRRFromAllBranch.js",
+            "args": [
+                "-p",
+                "E:/tools/dest/MicrosoftDocs/xamarin-docs-pr"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "SearchContent",
             "program": "${workspaceFolder}/searchContent.js",
             "args": [
