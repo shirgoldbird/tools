@@ -16,6 +16,6 @@ console.log(`Found ${repoFolders.length} git folder under the search destination
 repoFolders.forEach(dir => {
     console.log(`Pulling '${dir}'...`);
     execSync('git reset --hard HEAD', { cwd: dir });
-    execSync('git pull', { cwd: dir });
+    execSync('git pull origin HEAD', { cwd: dir });
     console.log(`Finish pulling '${dir}'`);
 })
