@@ -21,7 +21,9 @@ const supportedSchemas = [
     'contextobject',
     'emailoptinpreferences',
     'formmodel',
+    'sample',
     'zonepivotgroups',
+    'YamlDocument'
 ];
 
 searchFromFolders(

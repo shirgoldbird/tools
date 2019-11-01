@@ -20,7 +20,8 @@ searchFromFolders(
         return glob.sync(
             path.join(searchPath, '**/*.md'),
             {
-                dot: true
+                dot: true,
+                nodir: true
             })
     },
     function (file) {
