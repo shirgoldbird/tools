@@ -18,7 +18,7 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
 
     const gitFolders = glob.sync(`${basePath}/*/*/.git/`, { dot: true }).map(item => path.dirname(item));
     console.log(`Found ${gitFolders.length} git folder under the search destination`);
-    for await ( const dir of gitFolders) {
+    for await ( const dir of gitFolders ) {
         const files = searchGlob(dir);
         console.log(`searching from folder ${dir}...`)
         var itemCount = {};
@@ -57,15 +57,17 @@ function generateReport(result, gitFolders) {
     });
 
     console.log('============================')
-    console.log('# Here is the search report:')
+    console.log('# Search Report:')
     console.log('------')
-    console.log(`  ## There are ${gitFolders.length} git folder founded in the search destination folder, here is all the their repository urls:`)
+    console.log(`  ## There were ${gitFolders.length} folders searched:`)
     result.forEach(item => {
-        console.log(`    ${item.repositoryUrl}`)
+        console.log(`    ${item.folderName} (URL: ${item.repositoryUrl})`)
     })
 
     console.log('------')
-    console.log('  ## Here are the repositories which contains the search target:')
+        console.log(`  ## ${foundItems.length} folders contained the search target.`)
+    
+        console.log('  ## Detailed search results:')
     foundItems.forEach(item => {
         console.log(`    ${item.repositoryUrl}`)
     })
