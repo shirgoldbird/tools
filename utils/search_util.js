@@ -21,7 +21,9 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
     for await ( const dir of gitFolders ) {
         const files = searchGlob(dir);
         console.log(`searching from folder ${dir}...`)
-        var itemCount = {};
+        var itemCount = 0;
+        var searchTerm = '';
+        var filesFound = [];
         await parallelForEach(files, async (file, count, total) => {
             var eof = count !== total ? '\r' : '\n'
             if (count % 100 == 0 || count == total) {
@@ -29,18 +31,18 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
             }
             var fileSearchResult = await searchFromFile(file);
             if (fileSearchResult) {
-                if (itemCount[fileSearchResult]) {
-                    itemCount[fileSearchResult]++;
-                } else {
-                    itemCount[fileSearchResult] = 1;
-                }
+                itemCount++;
+                searchTerm = fileSearchResult;
+                filesFound.push(file);
             }
         })
         result.push({
             folderName: dir,
             repositoryUrl: (await git(dir).listRemote(['--get-url'])).trim(),
             totalFileCount: files.length,
-            itemCount
+            itemCount,
+            filesFound,
+            searchTerm
         })
 
         if (repoCount == gitFolders.length) {
@@ -48,12 +50,11 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
         }
         repoCount = repoCount + 1;
     }
-    fs.writeFileSync(`output-${(new Date()).getTime()}.json`, JSON.stringify(result))
 }
 
 function generateReport(result, gitFolders) {
     const foundItems = result.filter(item => {
-        return Object.keys(item.itemCount).length > 0;
+        return item.itemCount > 0;
     });
 
     console.log('============================')
@@ -64,12 +65,14 @@ function generateReport(result, gitFolders) {
         console.log(`    ${item.folderName} (URL: ${item.repositoryUrl})`)
     })
 
+    if (foundItems.length > 0) {
     console.log('------')
         console.log(`  ## ${foundItems.length} folders contained the search target.`)
     
         console.log('  ## Detailed search results:')
     foundItems.forEach(item => {
-        console.log(`    ${item.repositoryUrl}`)
+            console.log(`    ${item.folderName}:`)
+            console.log(`        ${item.itemCount}/${item.totalFileCount} files contained "${item.searchTerm}"`)
     })
 
         const currTime = getDateString();
