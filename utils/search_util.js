@@ -16,10 +16,10 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
     var result = [];
     var repoCount = 1;
 
-    const gitFolders = glob.sync(`${basePath}/*/*/.git/`, { dot: true }).map(item => item.substring(basePath.length + 1, item.length - 6))
+    const gitFolders = glob.sync(`${basePath}/*/*/.git/`, { dot: true }).map(item => path.dirname(item));
     console.log(`Found ${gitFolders.length} git folder under the search destination`);
     for await ( const dir of gitFolders) {
-        const files = searchGlob(path.join(basePath, dir));
+        const files = searchGlob(dir);
         console.log(`searching from folder ${dir}...`)
         var itemCount = {};
         await parallelForEach(files, async (file, count, total) => {
@@ -38,7 +38,7 @@ async function searchFromFolders(basePath, searchGlob, searchFromFile) {
         })
         result.push({
             folderName: dir,
-            repositoryUrl: (await git(path.join(basePath, dir)).listRemote(['--get-url'])).trim(),
+            repositoryUrl: (await git(dir).listRemote(['--get-url'])).trim(),
             totalFileCount: files.length,
             itemCount
         })
