@@ -72,14 +72,24 @@ function generateReport(result, gitFolders) {
         console.log(`    ${item.repositoryUrl}`)
     })
 
-    console.log('------')
-    console.log('  ## Here is the detail search result:')
-    foundItems.forEach(item => {
-        console.log(`    ${item.folderName}(${item.repositoryUrl}):`)
-        Object.keys(item.itemCount).forEach(key => {
-            console.log(`      ${key}: ${item.itemCount[key]}/${item.totalFileCount}`)
-        })
-    })
+        const currTime = getDateString();
+    
+        fs.writeFileSync(`output-${currTime}.json`, JSON.stringify(result, null, "\t"));
+        console.log(`Search results have been written to output-${currTime}.json`);
+    } else {
+        console.log("No folders contained the search target.")
+    }
+}
+
+function getDateString() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    const seconds = date.getSeconds();
+    const minutes = date.getMinutes();
+    const hour = date.getHours();
+    return `${year}-${month}-${day}T${hour}_${minutes}_${seconds}`
 }
 
 module.exports.searchFromFolders = searchFromFolders
